@@ -42,7 +42,7 @@ fn compile_expr(e: &Expr) -> String {
 }
 
 fn main() -> std::io::Result<()> {
-    // Usage: cargo run -- <input.snek> <output.s>
+    // The usage of the program: cargo run -- <input.snek> <output.s>
     let args: Vec<String> = env::args().collect();
     if args.len() != 3 {
         eprintln!("Usage: {} <input.snek> <output.s>", args[0]);
@@ -51,19 +51,19 @@ fn main() -> std::io::Result<()> {
     let in_name = &args[1];
     let out_name = &args[2];
 
-    // Read input program
+    // Reading the input program
     let mut in_file = File::open(in_name)?;
     let mut in_contents = String::new();
     in_file.read_to_string(&mut in_contents)?;
 
-    // Parse s-expression text -> AST
+    // Parsing the s-expression text -> AST
     let sexp = parse(&in_contents).expect("Failed to parse S-expression");
     let expr = parse_expr(&sexp);
 
-    // Compile AST -> assembly body
+    // Compiling the AST -> assembly body
     let body = compile_expr(&expr);
 
-    // Wrap as a full NASM file with an exported symbol
+    // Wrapping as a full NASM file with an exported symbol
     let asm_program = format!(
         "section .text
 global our_code_starts_here
@@ -71,14 +71,14 @@ our_code_starts_here:
   {}
   ret
 ",
-        // indent the body a bit so output is readable
+        // indenting the body a bit so the output is readable
         body.lines()
             .map(|line| format!("  {}", line))
             .collect::<Vec<_>>()
             .join("\n")
     );
 
-    // Write output assembly
+    // Writing the output assembly
     let mut out_file = File::create(out_name)?;
     out_file.write_all(asm_program.as_bytes())?;
 
